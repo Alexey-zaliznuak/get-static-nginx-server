@@ -5,9 +5,6 @@ A simple server for getting static, integrated with
 [Yandex.Disk](https://disk.yandex.ru) by [WebDAV](http://www.webdav.org/specs/rfc4918.html)
 
 
-
-
-
 ## API Reference
 
 #### Get file
@@ -21,12 +18,13 @@ It redirects on
   GET https://webdav.yandex.ru/$BASE_PATH/path/to/file
 ```
 
+
 ## Environment Variables
 
 See .env [exmaple](.env.template)
 
 
-To run this project, you will need to add the following environment variables to your .env file
+You will need to add the following environment variables to your .env file
 
 `AUTH_TOKEN` - OAuth token for [Yandex.Disk API](https://yandex.ru/dev/disk/)
 
