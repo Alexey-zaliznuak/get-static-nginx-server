@@ -1,0 +1,10 @@
+services:
+  nginx:
+    build:
+      dockerfile: ./docker/Dockerfile
+
+    env_file:
+      - .env
+
+    ports:
+      - "${NGINX_PORT}:80"

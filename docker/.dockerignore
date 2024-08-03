@@ -1,0 +1,7 @@
+.env.dist
+
+.gitignore
+
+docker-compose*
+
+test*

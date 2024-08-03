@@ -1,0 +1,15 @@
+server {
+    listen 80;
+    server_tokens off;
+
+    # Download files
+    location / {
+        proxy_pass https://webdav.yandex.ru/;
+        proxy_set_header Host webdav.yandex.ru;
+        proxy_set_header Authorization "Basic $AUTH_TOKEN";
+
+        rewrite ^/(.*)$ /$BASE_PATH/$1 break;
+
+        limit_except GET { deny all; }
+    }
+}
