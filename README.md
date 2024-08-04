@@ -1,7 +1,7 @@
 
 # Simple Static Server
 
-A simple server for getting static, integrated with
+A simple server for download/upload static, integrated with
 [Yandex.Disk](https://disk.yandex.ru) by [WebDAV](http://www.webdav.org/specs/rfc4918.html)
 
 
