@@ -27,6 +27,7 @@ http {
     map $request_method $auth_required_in_method {
         default auth_not_required;
         PUT auth_required;
+        DELETE auth_required;
     }
 
     # Verification of authorization by method and Authorization header
@@ -48,7 +49,7 @@ http {
         location / {
             rewrite ^/(.*)$ /$BASE_PATH/$1 break;
 
-            limit_except GET PUT {
+            limit_except GET PUT DELETE {
                 deny all;
             }
 
