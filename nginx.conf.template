@@ -1,15 +1,64 @@
-server {
-    listen 80;
-    server_tokens off;
+user  nginx;
+worker_processes  auto;
 
-    # Download files
-    location / {
-        proxy_pass https://webdav.yandex.ru/;
-        proxy_set_header Host webdav.yandex.ru;
-        proxy_set_header Authorization "Basic $AUTH_TOKEN";
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
 
-        rewrite ^/(.*)$ /$BASE_PATH/$1 break;
+events {
+    worker_connections  1024;
+}
 
-        limit_except GET { deny all; }
+http {
+    map_hash_bucket_size 256;
+
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format main '$remote_addr - $remote_user [$time_local] $request_time_ms ms. '
+        '$status $request $body_bytes_sent "$http_referer" '
+        '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+    keepalive_timeout  65;
+
+    # Determining the need for authorization by the request method
+    map $request_method $auth_required_in_method {
+        default auth_not_required;
+        PUT auth_required;
+    }
+
+    # Verification of authorization by method and Authorization header
+    map "$auth_required_in_method:$http_authorization" $is_authorized {
+        default unauthorized;
+        "auth_required:$SERVER_AUTH_TOKEN" authorized;
+    }
+
+    # Convert request time in ms
+    map $request_time $request_time_ms {
+        ~^([0-9]+)\.([0-9]+)$ $1$2;
+        default $request_time;
+    }
+
+    server {
+        listen 80;
+        server_tokens off;
+
+        location / {
+            rewrite ^/(.*)$ /$BASE_PATH/$1 break;
+
+            limit_except GET PUT {
+                deny all;
+            }
+
+            if ($is_authorized = unauthorized) {
+                return 403;
+            }
+
+            proxy_pass https://webdav.yandex.ru/;
+            proxy_set_header Host webdav.yandex.ru;
+            proxy_set_header Authorization "Basic $YANDEX_DISK_AUTH_TOKEN";
+        }
     }
 }
